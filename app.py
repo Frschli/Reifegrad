@@ -5,6 +5,10 @@ from collections import defaultdict
 
 st.set_page_config(page_title="KI-Reifegrad Mittelstand", layout="wide")
 
+# Default-Werte, falls weiter unten noch kein Sidebar-Wert gesetzt ist
+scope = "Unternehmensweit"
+role_filter = "Alle"
+
 # -------------------------
 # Fragenkatalog
 # -------------------------
@@ -884,4 +888,5 @@ with tab_auswertung:
     with col2:
         st.subheader("Spidergraphik (Fragenkatalog)")
         plot_radar(dim_scores, f"Reifegrad – {scope} ({role_filter})")
+
 
