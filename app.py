@@ -500,7 +500,11 @@ def score_select(level, mapping):
 # -------------------------
 
 def render_question_section(scope, role_filter):
-    filtered_questions = [
+    # -------------------------
+# Fragen-Eingabe
+# -------------------------
+
+filtered_questions = [
     q for q in QUESTIONS
     if q["scope"] == scope and role_matches(role_filter, q["role"])
 ]
@@ -844,4 +848,5 @@ with tab_auswertung:
     with col2:
         st.subheader("Spidergraphik (Fragenkatalog)")
         plot_radar(dim_scores, f"Reifegrad – {scope} ({role_filter})")
+
 
