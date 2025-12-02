@@ -395,6 +395,37 @@ QUESTIONS = [
 ]
 
 # -------------------------
+# Skala 0–5 (Texte)
+# -------------------------
+
+SCALE_DEFS = {
+    0: {
+        "kurz": "nicht vorhanden",
+        "detail": "Keinerlei Struktur, Zuständigkeit oder Aktivitäten im KI-Kontext."
+    },
+    1: {
+        "kurz": "sehr rudimentär",
+        "detail": "Einzelne, personengeprägte Aktivitäten ohne Struktur, ohne stabile Datenbasis, ohne klare Ziele."
+    },
+    2: {
+        "kurz": "grundlegend vorhanden",
+        "detail": "Erste Verantwortlichkeiten und Pilotprozesse, nutzbare Datenquellen, Erfolgsmessung punktuell vorhanden."
+    },
+    3: {
+        "kurz": "etabliert in Teilbereichen",
+        "detail": "Klare Rollen und Prozesse, wiederverwendbare Daten- und Tool-Basis, messbare Ergebnisse in mehreren Bereichen."
+    },
+    4: {
+        "kurz": "weitgehend integriert",
+        "detail": "KI ist in Kernprozesse und Systeme eingebettet, unternehmensweit verfügbar und wird aktiv über Business-KPIs gesteuert."
+    },
+    5: {
+        "kurz": "voll etabliert",
+        "detail": "KI ist selbstverständlicher Bestandteil von Strategie, Prozessen und Systemen mit nachweisbarem, dauerhaftem Business-Impact."
+    },
+}
+
+# -------------------------
 # Hilfsfunktionen
 # -------------------------
 
@@ -546,12 +577,6 @@ def render_question_section(scope, role_filter):
                 )
 
     return answers
-
-    # -------------------------
-# Fragen-Eingabe
-# -------------------------
-
-answers = render_question_section(scope, role_filter)
 
 def render_metrics_section():
     st.subheader("Kennzahlen & Use-Case-Durchdringung")
@@ -792,6 +817,13 @@ for dim in all_dimensions:
 
 st.title("KI-Reifegrad-Assessment – Mittelstand")
 
+with st.expander("Erläuterung der Skala 0–5"):
+    for lvl in range(0, 6):
+        st.markdown(
+            f"**{lvl} – {SCALE_DEFS[lvl]['kurz']}**  \n"
+            f"{SCALE_DEFS[lvl]['detail']}"
+        )
+
 meta_info = []
 if company:
     meta_info.append(f"Firma: {company}")
@@ -852,6 +884,4 @@ with tab_auswertung:
     with col2:
         st.subheader("Spidergraphik (Fragenkatalog)")
         plot_radar(dim_scores, f"Reifegrad – {scope} ({role_filter})")
-
-
 
