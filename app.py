@@ -5,10 +5,6 @@ from collections import defaultdict
 
 st.set_page_config(page_title="KI-Reifegrad Mittelstand", layout="wide")
 
-# Default-Werte, falls weiter unten noch kein Sidebar-Wert gesetzt ist
-scope = "Unternehmensweit"
-role_filter = "Alle"
-
 # -------------------------
 # Fragenkatalog
 # -------------------------
@@ -534,7 +530,11 @@ def score_select(level, mapping):
 # UI-Komponenten
 # -------------------------
 
-def render_question_section(scope, role_filter):
+def render_question_section():
+    # Scope & Rolle aus Session holen (oder Default)
+    scope = st.session_state.get("scope", "Unternehmensweit")
+    role_filter = st.session_state.get("role_filter", "Alle")
+
     filtered_questions = [
         q for q in QUESTIONS
         if q["scope"] == scope and role_matches(role_filter, q["role"])
@@ -552,7 +552,6 @@ def render_question_section(scope, role_filter):
                 st.markdown(f"### {group_label}")
                 current_group = group_label
 
-            # Frage groß darstellen
             st.markdown(
                 f"""
                 <div style="font-size:18px; font-weight:500; line-height:1.3; margin-top:0.4rem; margin-bottom:0.2rem;">
@@ -562,7 +561,6 @@ def render_question_section(scope, role_filter):
                 unsafe_allow_html=True,
             )
 
-            # Slider links unter der Frage, aber kürzer über Spalte
             col_slider, _ = st.columns([1, 3])
             with col_slider:
                 val = st.slider(
@@ -575,7 +573,6 @@ def render_question_section(scope, role_filter):
                 )
                 answers[q["id"]] = val
 
-                # Skalenbeschreibung passend zum gewählten Wert
                 st.caption(
                     f"{val} – {SCALE_DEFS[val]['kurz']}: {SCALE_DEFS[val]['detail']}"
                 )
@@ -791,12 +788,14 @@ assessor = st.sidebar.text_input("Bearbeiter", value="")
 
 scope = st.sidebar.selectbox(
     "Bereich",
-    ["Unternehmensweit", "Entwicklung", "Einkauf", "Service"]
+    ["Unternehmensweit", "Entwicklung", "Einkauf", "Service"],
+    key="scope"
 )
 
 role_filter = st.sidebar.selectbox(
     "Rollenfilter",
-    ["Alle", "Management", "Fachbereich", "IT"]
+    ["Alle", "Management", "Fachbereich", "IT"],
+    key="role_filter"
 )
 
 all_dimensions = sorted({q["dimension"] for q in QUESTIONS})
@@ -845,7 +844,7 @@ tab_fragen, tab_kennzahlen, tab_auswertung = st.tabs(
 )
 
 with tab_fragen:
-    answers = render_question_section(scope, role_filter)
+    answers = render_question_section()
 
 with tab_kennzahlen:
     metrics_score = render_metrics_section()
@@ -888,5 +887,3 @@ with tab_auswertung:
     with col2:
         st.subheader("Spidergraphik (Fragenkatalog)")
         plot_radar(dim_scores, f"Reifegrad – {scope} ({role_filter})")
-
-
