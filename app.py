@@ -500,54 +500,58 @@ def score_select(level, mapping):
 # -------------------------
 
 def render_question_section(scope, role_filter):
+    filtered_questions = [
+        q for q in QUESTIONS
+        if q["scope"] == scope and role_matches(role_filter, q["role"])
+    ]
+
+    answers = {}
+    current_group = None
+
+    if not filtered_questions:
+        st.write("Keine Fragen für diese Kombination aus Bereich und Rolle definiert.")
+    else:
+        for q in filtered_questions:
+            group_label = f"{q['dimension']} – Rolle: {q['role']}"
+            if group_label != current_group:
+                st.markdown(f"### {group_label}")
+                current_group = group_label
+
+            # Frage groß darstellen
+            st.markdown(
+                f"""
+                <div style="font-size:18px; font-weight:500; line-height:1.3; margin-top:0.4rem; margin-bottom:0.2rem;">
+                    {q['text']}
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            # Slider links unter der Frage, aber kürzer über Spalte
+            col_slider, _ = st.columns([1, 3])
+            with col_slider:
+                val = st.slider(
+                    label="Bewertung (0–5)",
+                    min_value=0,
+                    max_value=5,
+                    value=0,
+                    step=1,
+                    key=q["id"]
+                )
+                answers[q["id"]] = val
+
+                # Skalenbeschreibung passend zum gewählten Wert
+                st.caption(
+                    f"{val} – {SCALE_DEFS[val]['kurz']}: {SCALE_DEFS[val]['detail']}"
+                )
+
+    return answers
+
     # -------------------------
 # Fragen-Eingabe
 # -------------------------
 
-filtered_questions = [
-    q for q in QUESTIONS
-    if q["scope"] == scope and role_matches(role_filter, q["role"])
-]
-
-answers = {}
-current_group = None
-
-if not filtered_questions:
-    st.write("Keine Fragen für diese Kombination aus Bereich und Rolle definiert.")
-else:
-    for q in filtered_questions:
-        group_label = f"{q['dimension']} – Rolle: {q['role']}"
-        if group_label != current_group:
-            st.markdown(f"### {group_label}")
-            current_group = group_label
-
-        # Frage groß darstellen
-        st.markdown(
-            f"""
-            <div style="font-size:18px; font-weight:500; line-height:1.3; margin-top:0.4rem; margin-bottom:0.2rem;">
-                {q['text']}
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        # Slider links unter der Frage, aber kürzer über Spalte
-        col_slider, _ = st.columns([1, 3])
-        with col_slider:
-            val = st.slider(
-                label="Bewertung (0–5)",
-                min_value=0,
-                max_value=5,
-                value=0,
-                step=1,
-                key=q["id"]
-            )
-            answers[q["id"]] = val
-
-            # Skalenbeschreibung passend zum gewählten Wert
-            st.caption(
-                f"{val} – {SCALE_DEFS[val]['kurz']}: {SCALE_DEFS[val]['detail']}"
-            )
+answers = render_question_section(scope, role_filter)
 
 def render_metrics_section():
     st.subheader("Kennzahlen & Use-Case-Durchdringung")
@@ -848,5 +852,6 @@ with tab_auswertung:
     with col2:
         st.subheader("Spidergraphik (Fragenkatalog)")
         plot_radar(dim_scores, f"Reifegrad – {scope} ({role_filter})")
+
 
 
