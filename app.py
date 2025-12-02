@@ -545,9 +545,6 @@ else:
                 f"{val} – {SCALE_DEFS[val]['kurz']}: {SCALE_DEFS[val]['detail']}"
             )
 
-
-    return answers
-
 def render_metrics_section():
     st.subheader("Kennzahlen & Use-Case-Durchdringung")
 
@@ -847,3 +844,4 @@ with tab_auswertung:
     with col2:
         st.subheader("Spidergraphik (Fragenkatalog)")
         plot_radar(dim_scores, f"Reifegrad – {scope} ({role_filter})")
+
